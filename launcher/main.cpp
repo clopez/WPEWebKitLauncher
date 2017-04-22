@@ -72,6 +72,100 @@ WKViewClientV0 s_viewClient = {
     },
 };
 
+WKPageUIClientV8 s_pageUiClient = {
+    { 8, nullptr },
+
+    // Version 0.
+    nullptr, // createNewPage_deprecatedForUseWithV0
+    nullptr, // showPage
+    nullptr, // close
+    nullptr, // takeFocus
+    nullptr, // focus
+    nullptr, // unfocus
+    nullptr, // runJavaScriptAlert_deprecatedForUseWithV0
+    nullptr, // runJavaScriptConfirm_deprecatedForUseWithV0
+    nullptr, // runJavaScriptPrompt_deprecatedForUseWithV0
+    nullptr, // setStatusText
+    nullptr, // mouseDidMoveOverElement_deprecatedForUseWithV0
+    nullptr, // missingPluginButtonClicked_deprecatedForUseWithV0
+    nullptr, // didNotHandleKeyEvent
+    nullptr, // didNotHandleWheelEvent
+    nullptr, // toolbarsAreVisible
+    nullptr, // setToolbarsAreVisible
+    nullptr, // menuBarIsVisible
+    nullptr, // setMenuBarIsVisible
+    nullptr, // statusBarIsVisible
+    nullptr, // setStatusBarIsVisible
+    nullptr, // isResizable
+    nullptr, // setIsResizable
+    nullptr, // getWindowFrame
+    nullptr, // setWindowFrame
+    nullptr, // runBeforeUnloadConfirmPanel_deprecatedForUseWithV6
+    nullptr, // didDraw
+    nullptr, // pageDidScroll
+    nullptr, // exceededDatabaseQuota
+    nullptr, // runOpenPanel
+    nullptr, // decidePolicyForGeolocationPermissionRequest
+    nullptr, // headerHeight
+    nullptr, // footerHeight
+    nullptr, // drawHeader
+    nullptr, // drawFooter
+    nullptr, // printFrame
+    nullptr, // runModal
+    nullptr, // unused1 // Used to be didCompleteRubberBandForMainFrame
+    nullptr, // saveDataToFileInDownloadsFolder
+    nullptr, // shouldInterruptJavaScript_unavailable
+
+    // Version 1.
+    nullptr, // createNewPage_deprecatedForUseWithV1
+    nullptr, // mouseDidMoveOverElement
+    nullptr, // decidePolicyForNotificationPermissionRequest
+    nullptr, // unavailablePluginButtonClicked_deprecatedForUseWithV1
+
+    // Version 2.
+    nullptr, // showColorPicker
+    nullptr, // hideColorPicker
+    nullptr, // unavailablePluginButtonClicked
+
+    // Version 3.
+    nullptr, // pinnedStateDidChange
+
+    // Version 4.
+    nullptr, // unused2 // Used to be didBeginTrackingPotentialLongMousePress.
+    nullptr, // unused3 // Used to be didRecognizeLongMousePress.
+    nullptr, // unused4 // Used to be didCancelTrackingPotentialLongMousePress.
+    nullptr, // isPlayingAudioDidChange
+
+    // Version 5.
+    nullptr, // decidePolicyForUserMediaPermissionRequest
+    nullptr, // didClickAutoFillButton
+    nullptr, // runJavaScriptAlert_deprecatedForUseWithV5
+    nullptr, // runJavaScriptConfirm_deprecatedForUseWithV5
+    nullptr, // runJavaScriptPrompt_deprecatedForUseWithV5
+    nullptr, // mediaSessionMetadataDidChange
+
+    // Version 6.
+    nullptr, // createNewPage
+    nullptr, // runJavaScriptAlert
+    nullptr, // runJavaScriptConfirm
+    nullptr, // runJavaScriptPrompt
+    // checkUserMediaPermissionForOrigin
+    [](WKPageRef, WKFrameRef, WKSecurityOriginRef, WKSecurityOriginRef, WKUserMediaPermissionCheckRef deviceRequest, const void*) {
+        // TODO: Do not just accept all requests.
+        auto hashSalt = WKStringCreateWithUTF8CString("dummySalt");
+        WKUserMediaPermissionCheckSetUserMediaAccessInfo(hashSalt, true);
+        WKRelease(hashSalt);
+        return true;
+    },
+
+    // Version 7.
+    nullptr, // runBeforeUnloadConfirmPanel
+    nullptr, // fullscreenMayReturnToInline
+
+    // Version 8.
+    nullptr, // willAddDetailedMessageToConsole
+};
+
 int main(int argc, char* argv[])
 {
     GMainLoop* loop = g_main_loop_new(nullptr, FALSE);
@@ -130,6 +224,7 @@ int main(int argc, char* argv[])
 
     auto page = WKViewGetPage(view);
     WKPageSetPageNavigationClient(page, &s_navigationClient.base);
+    WKPageSetPageUIClient(page, &s_pageUiClient.base);
 
     const char* url = "http://youtube.com/tv";
     if (argc > 1)
