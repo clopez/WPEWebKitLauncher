@@ -1,5 +1,6 @@
 #include <WPE/WebKit.h>
 #include <WPE/WebKit/WKCookieManagerSoup.h>
+#include <WPE/WebKit/WKUserMediaPermissionCheck.h>
 
 #include <cstdio>
 #include <glib.h>
@@ -155,7 +156,6 @@ WKPageUIClientV8 s_pageUiClient = {
         auto hashSalt = WKStringCreateWithUTF8CString("dummySalt");
         WKUserMediaPermissionCheckSetUserMediaAccessInfo(hashSalt, true);
         WKRelease(hashSalt);
-        return true;
     },
 
     // Version 7.
