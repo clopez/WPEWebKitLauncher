@@ -154,7 +154,7 @@ WKPageUIClientV8 s_pageUiClient = {
     [](WKPageRef, WKFrameRef, WKSecurityOriginRef, WKSecurityOriginRef, WKUserMediaPermissionCheckRef deviceRequest, const void*) {
         // TODO: Do not just accept all requests.
         auto hashSalt = WKStringCreateWithUTF8CString("dummySalt");
-        WKUserMediaPermissionCheckSetUserMediaAccessInfo(hashSalt, true);
+        WKUserMediaPermissionCheckSetUserMediaAccessInfo(deviceRequest, hashSalt, true);
         WKRelease(hashSalt);
     },
 
