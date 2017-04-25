@@ -1,6 +1,7 @@
 #include <WPE/WebKit.h>
 #include <WPE/WebKit/WKCookieManagerSoup.h>
 #include <WPE/WebKit/WKUserMediaPermissionCheck.h>
+#include <WPE/WebKit/WKUserMediaPermissionRequest.h>
 
 #include <cstdio>
 #include <glib.h>
@@ -138,7 +139,16 @@ WKPageUIClientV8 s_pageUiClient = {
     nullptr, // isPlayingAudioDidChange
 
     // Version 5.
-    nullptr, // decidePolicyForUserMediaPermissionRequest
+    // decidePolicyForUserMediaPermissionRequest
+    [](WKPageRef, WKFrameRef, WKSecurityOriginRef, WKSecurityOriginRef, WKUserMediaPermissionRequestRef permissionRequest, const void*) {
+        // TODO: Do not just accept all requests.
+        // XXX: These hardcoded identifiers are the same as used by the OWR backend.
+        auto audioDeviceUID = WKStringCreateWithUTF8CString("audio");
+        auto videoDeviceUID = WKStringCreateWithUTF8CString("video");
+        WKUserMediaPermissionRequestAllow(permissionRequest, audioDeviceUID, videoDeviceUID);
+        WKRelease(videoDeviceUID);
+        WKRelease(audioDeviceUID);
+    },
     nullptr, // didClickAutoFillButton
     nullptr, // runJavaScriptAlert_deprecatedForUseWithV5
     nullptr, // runJavaScriptConfirm_deprecatedForUseWithV5
