@@ -142,12 +142,24 @@ WKPageUIClientV8 s_pageUiClient = {
     // decidePolicyForUserMediaPermissionRequest
     [](WKPageRef, WKFrameRef, WKSecurityOriginRef, WKSecurityOriginRef, WKUserMediaPermissionRequestRef permissionRequest, const void*) {
         // TODO: Do not just accept all requests.
-        // XXX: These hardcoded identifiers are the same as used by the OWR backend.
-        auto audioDeviceUID = WKStringCreateWithUTF8CString("audio");
-        auto videoDeviceUID = WKStringCreateWithUTF8CString("video");
-        WKUserMediaPermissionRequestAllow(permissionRequest, audioDeviceUID, videoDeviceUID);
-        WKRelease(videoDeviceUID);
-        WKRelease(audioDeviceUID);
+        auto audioDeviceUIDs = WKUserMediaPermissionRequestAudioDeviceUIDs(permissionRequest);
+        auto videoDeviceUIDs = WKUserMediaPermissionRequestVideoDeviceUIDs(permissionRequest);
+
+        auto numAudioDevices = WKArrayGetSize(audioDeviceUIDs);
+        auto numVideoDevices = WKArrayGetSize(videoDeviceUIDs);
+        auto n = (numAudioDevices > numVideoDevices) ? numAudioDevices : numVideoDevices;
+
+        auto emptyString = WKStringCreateWithUTF8CString("");
+
+        for (auto i = 0; i < n; i++) {
+            auto audioDeviceUID = (i < numAudioDevices) ? reinterpret_cast<WKStringRef>(WKArrayGetItemAtIndex(audioDeviceUIDs, i)) : emptyString;
+            auto videoDeviceUID = (i < numVideoDevices) ? reinterpret_cast<WKStringRef>(WKArrayGetItemAtIndex(videoDeviceUIDs, i)) : emptyString;
+            WKUserMediaPermissionRequestAllow(permissionRequest, audioDeviceUID, videoDeviceUID);
+        }
+
+        WKRelease(audioDeviceUIDs);
+        WKRelease(videoDeviceUIDs);
+        WKRelease(emptyString);
     },
     nullptr, // didClickAutoFillButton
     nullptr, // runJavaScriptAlert_deprecatedForUseWithV5
